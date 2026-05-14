@@ -9,7 +9,7 @@ from incidents.serializers import (
     IncidentCreateSerializer,
     IncidentUpdateSerializer,
 )
-from incidents.services import create_activity_log
+from incidents.services import create_activity_log, validate_status_transition
 
 
 class IncidentViewSet(viewsets.ModelViewSet):
@@ -99,6 +99,14 @@ class IncidentViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+
+        new_status = serializer.validated_data.get("status", instance.status)
+
+        validate_status_transition(
+            old_status=instance.status,
+            new_status=new_status,
+            user_role=request.user.role,
+        )
 
         incident = serializer.save(updated_by=request.user)
 

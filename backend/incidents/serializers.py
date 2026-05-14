@@ -85,6 +85,7 @@ class IncidentUpdateSerializer(serializers.ModelSerializer):
     assigned_to_id = serializers.IntegerField(
         required=False, allow_null=True, write_only=True
     )
+    status = serializers.ChoiceField(choices=Incident.Status, required=False)
 
     class Meta:
         model = Incident
@@ -93,6 +94,7 @@ class IncidentUpdateSerializer(serializers.ModelSerializer):
             "description",
             "priority",
             "assigned_to_id",
+            "status",
         )
 
     @staticmethod
