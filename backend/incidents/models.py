@@ -68,3 +68,45 @@ class Incident(models.Model):
 
     def __str__(self):
         return f"[{self.get_priority_display()}] {self.title}"
+
+
+class IncidentActivityLog(models.Model):
+    class Action(models.TextChoices):
+        CREATED = "created", "Created"
+        UPDATED = "updated", "Updated"
+        STATUS_CHANGED = "status_changed", "Status Changed"
+        PRIORITY_CHANGED = "priority_changed", "Priority Changed"
+        ASSIGNED = "assigned", "Assigned"
+        COMMENTED = "commented", "Commented"
+        ATTACHMENT_UPLOADED = "attachment_uploaded", "Attachment Uploaded"
+        RETURNED = "returned", "Returned"
+        RESOLVED = "resolved", "Resolved"
+        CANCELLED = "cancelled", "Cancelled"
+        CLOSED = "closed", "Closed"
+        ARCHIVED = "archived", "Archived"
+
+    incident = models.ForeignKey(
+        Incident,
+        on_delete=models.CASCADE,
+        related_name="activity_logs",
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    action = models.CharField(max_length=50, choices=Action)
+
+    field_name = models.CharField(max_length=100, null=True, blank=True)
+
+    old_value = models.TextField(null=True, blank=True)
+
+    new_value = models.TextField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.action} - Incident #{self.incident_id}"
