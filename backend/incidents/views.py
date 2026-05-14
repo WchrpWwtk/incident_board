@@ -102,3 +102,21 @@ class IncidentViewSet(viewsets.ModelViewSet):
         response_serializer = IncidentDetailSerializer(incident)
 
         return Response(response_serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        incident = self.get_object()
+
+        incident.is_archived = True
+        incident.updated_by = request.user
+        incident.save(update_fields=["is_archived", "updated_by", "updated_at"])
+
+        create_activity_log(
+            incident=incident,
+            user=request.user,
+            action=IncidentActivityLog.Action.ARCHIVED,
+            field_name="is_archived",
+            old_value=False,
+            new_value=True,
+        )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
