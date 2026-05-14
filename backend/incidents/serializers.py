@@ -49,6 +49,10 @@ class IncidentDetailSerializer(serializers.ModelSerializer):
 
 
 class IncidentCreateSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=True, allow_blank=False, max_length=200)
+    description = serializers.CharField(required=True, allow_blank=False)
+    priority = serializers.ChoiceField(choices=Incident.Priority)
+
     class Meta:
         model = Incident
         fields = (
@@ -61,6 +65,8 @@ class IncidentCreateSerializer(serializers.ModelSerializer):
     def validate_title(value):
         if len(value.strip()) < 3:
             raise serializers.ValidationError("Title must be at least 3 characters.")
+
+        return value.strip()
 
     @staticmethod
     def validate_description(value):
