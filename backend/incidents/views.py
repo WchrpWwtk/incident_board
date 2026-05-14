@@ -15,6 +15,29 @@ from incidents.services import create_activity_log
 class IncidentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+    filterset_fields = (
+        "status",
+        "priority",
+        "assigned_to",
+        "created_by",
+    )
+
+    search_fields = (
+        "title",
+        "description",
+        "created_by__username",
+        "assigned_to__username",
+    )
+
+    ordering_fields = (
+        "created_at",
+        "updated_at",
+        "priority",
+        "status",
+    )
+
+    ordering = ("-created_at",)
+
     def get_queryset(self):
         return (
             Incident.objects.select_related("created_by", "assigned_to", "updated_by")
