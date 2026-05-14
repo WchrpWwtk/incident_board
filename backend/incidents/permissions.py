@@ -10,6 +10,8 @@ class IncidentPermission(BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
+        incident = getattr(obj, "incident", obj)
+
         user = request.user
 
         if user.role in ["admin", "manager"]:
@@ -22,6 +24,6 @@ class IncidentPermission(BasePermission):
             return False
 
         if user.role == "processor":
-            return obj.assigned_to_id == user.id
+            return incident.assigned_to_id == user.id
 
-        return obj.created_by_id == user.id
+        return incident.created_by_id == user.id
