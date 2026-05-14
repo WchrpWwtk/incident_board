@@ -84,6 +84,7 @@ class IncidentActivityLog(models.Model):
         CANCELLED = "cancelled", "Cancelled"
         CLOSED = "closed", "Closed"
         ARCHIVED = "archived", "Archived"
+        COMMENT_DELETED = "comment_deleted", "Comment Deleted"
 
     incident = models.ForeignKey(
         Incident,
