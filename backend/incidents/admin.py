@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from incidents.models import Incident, IncidentActivityLog, IncidentComment
+from incidents.models import (
+    Incident,
+    IncidentActivityLog,
+    IncidentComment,
+    IncidentAttachment,
+)
 
 
 @admin.register(Incident)
@@ -81,3 +86,22 @@ class IncidentCommentAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
+
+
+@admin.register(IncidentAttachment)
+class IncidentAttachmentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "incident",
+        "original_name",
+        "uploaded_by",
+        "size",
+        "uploaded_at",
+    )
+
+    search_fields = (
+        "incident__title",
+        "original_name",
+    )
+
+    readonly_fields = ("uploaded_at",)

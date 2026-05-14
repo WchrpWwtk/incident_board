@@ -131,3 +131,37 @@ class IncidentComment(models.Model):
 
     def __str__(self):
         return f"Comment on Incident #{self.incident_id}"
+
+
+class IncidentAttachment(models.Model):
+    incident = models.ForeignKey(
+        Incident, on_delete=models.CASCADE, related_name="attachments"
+    )
+
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    file = models.FileField(upload_to="incident_attachments/")
+
+    original_name = models.CharField(max_length=255)
+
+    content_type = models.CharField(max_length=100, blank=True)
+
+    size = models.PositiveIntegerField(default=0)
+
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-uploaded_at"]
+
+    def __str__(self):
+        return self.original_name
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            self.original_name = self.file.name
+            self.size = self.file.size
+            self.content_type = getattr(self.file.file, "content_type", "")
+
+        super().save(*args, **kwargs)
