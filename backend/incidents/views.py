@@ -204,3 +204,38 @@ class IncidentViewSet(viewsets.ModelViewSet):
         response_serializer = IncidentCommentSerializer(comment)
 
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class IncidentCommentViewSet(viewsets.GenericViewSet):
+    queryset = IncidentComment.objects.select_related("incident", "user")
+
+    permission_classes = [IncidentPermission]
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        comment = self.get_object()
+
+        incident = comment.incident
+        comment_body = comment.body
+
+        if (
+            request.user.role not in ["admin", "manager"]
+            and comment.user_id != request.user.id
+        ):
+            return Response(
+                {"detail": "You do not have permission to delete this comment."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        comment.delete()
+
+        create_activity_log(
+            incident=incident,
+            user=request.user,
+            action=IncidentActivityLog.Action.COMMENT_DELETED,
+            field_name="comment",
+            old_value=comment_body,
+            new_value=None,
+        )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
