@@ -1,14 +1,17 @@
 from django.db import transaction
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from incidents.models import Incident, IncidentActivityLog
+from incidents.models import Incident, IncidentActivityLog, IncidentComment
 from incidents.permissions import IncidentPermission
 from incidents.serializers import (
     IncidentListSerializer,
     IncidentDetailSerializer,
     IncidentCreateSerializer,
     IncidentUpdateSerializer,
+    IncidentCommentSerializer,
+    IncidentCommentCreateSerializer,
 )
 from incidents.services import create_activity_log, validate_status_transition
 
@@ -171,3 +174,33 @@ class IncidentViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, obj)
 
         return obj
+
+    @action(detail=True, methods=["get", "post"], url_path="comments")
+    def comments(self, request, pk=None):
+        incident = self.get_object()
+
+        if request.method == "GET":
+            comments = incident.comments.select_related("user").order_by("created_at")
+
+            serializer = IncidentCommentSerializer(comments, many=True)
+
+            return Response(serializer.data)
+
+        serializer = IncidentCommentCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        comment = IncidentComment.objects.create(
+            incident=incident, user=request.user, body=serializer.validated_data["body"]
+        )
+
+        create_activity_log(
+            incident=incident,
+            user=request.user,
+            action=IncidentActivityLog.Action.COMMENTED,
+            field_name="comment",
+            new_value=comment.body,
+        )
+
+        response_serializer = IncidentCommentSerializer(comment)
+
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)

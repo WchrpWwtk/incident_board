@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserSummarySerializer
-from incidents.models import Incident
+from incidents.models import Incident, IncidentComment
 
 
 class IncidentListSerializer(serializers.ModelSerializer):
@@ -114,5 +114,44 @@ class IncidentUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Description must be at least 10 characters."
             )
+
+        return value
+
+
+class IncidentCommentSerializer(serializers.ModelSerializer):
+    user = UserSummarySerializer(read_only=True)
+
+    class Meta:
+        model = IncidentComment
+        fields = (
+            "id",
+            "incident",
+            "user",
+            "body",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "incident",
+            "user",
+            "created_at",
+            "updated_at",
+        )
+
+
+class IncidentCommentCreateSerializer(serializers.ModelSerializer):
+    body = serializers.CharField(required=True, allow_blank=False)
+
+    class Meta:
+        model = IncidentComment
+        fields = ("body",)
+
+    @staticmethod
+    def validate_body(value):
+        value = value.strip()
+
+        if len(value) < 2:
+            raise serializers.ValidationError("Comment must be at least 2 characters.")
 
         return value
