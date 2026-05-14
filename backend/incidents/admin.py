@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from incidents.models import Incident, IncidentActivityLog
+from incidents.models import Incident, IncidentActivityLog, IncidentComment
 
 
 @admin.register(Incident)
@@ -60,3 +60,24 @@ class IncidentActivityLogAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ("created_at",)
+
+
+@admin.register(IncidentComment)
+class IncidentCommentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "incident",
+        "user",
+        "created_at",
+    )
+
+    search_fields = (
+        "incident__title",
+        "user__username",
+        "body",
+    )
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
