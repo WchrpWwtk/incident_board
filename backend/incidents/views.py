@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -76,6 +77,7 @@ class IncidentViewSet(viewsets.ModelViewSet):
             updated_by=self.request.user,
         )
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -89,6 +91,7 @@ class IncidentViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
@@ -144,6 +147,7 @@ class IncidentViewSet(viewsets.ModelViewSet):
 
         return Response(response_serializer.data)
 
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         incident = self.get_object()
 
