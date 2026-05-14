@@ -1,8 +1,8 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, status
 from rest_framework.response import Response
-from sentry_sdk.integrations.beam import raise_exception
 
 from incidents.models import Incident, IncidentActivityLog
+from incidents.permissions import IncidentPermission
 from incidents.serializers import (
     IncidentListSerializer,
     IncidentDetailSerializer,
@@ -13,7 +13,7 @@ from incidents.services import create_activity_log, validate_status_transition
 
 
 class IncidentViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IncidentPermission]
 
     filterset_fields = (
         "status",
@@ -161,3 +161,9 @@ class IncidentViewSet(viewsets.ModelViewSet):
         )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_object(self):
+        obj = super().get_object()
+        self.check_object_permissions(self.request, obj)
+
+        return obj
