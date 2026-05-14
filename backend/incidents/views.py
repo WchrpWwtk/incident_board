@@ -7,6 +7,7 @@ from incidents.serializers import (
     IncidentListSerializer,
     IncidentDetailSerializer,
     IncidentCreateSerializer,
+    IncidentUpdateSerializer,
 )
 
 
@@ -30,6 +31,9 @@ class IncidentViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             return IncidentCreateSerializer
 
+        if self.action in ["update", "partial_update"]:
+            return IncidentUpdateSerializer
+
         return IncidentDetailSerializer
 
     def perform_create(self, serializer):
@@ -50,3 +54,16 @@ class IncidentViewSet(viewsets.ModelViewSet):
             response_serializer.data,
             status=status.HTTP_201_CREATED,
         )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        incident = serializer.save(updated_by=request.user)
+
+        response_serializer = IncidentDetailSerializer(incident)
+
+        return Response(response_serializer.data)

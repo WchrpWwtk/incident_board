@@ -76,3 +76,41 @@ class IncidentCreateSerializer(serializers.ModelSerializer):
             )
 
         return value.strip()
+
+
+class IncidentUpdateSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False, allow_blank=False, max_length=200)
+    description = serializers.CharField(required=False, allow_blank=False)
+    priority = serializers.ChoiceField(choices=Incident.Priority, required=False)
+    assigned_to_id = serializers.IntegerField(
+        required=False, allow_null=True, write_only=True
+    )
+
+    class Meta:
+        model = Incident
+        fields = (
+            "title",
+            "description",
+            "priority",
+            "assigned_to_id",
+        )
+
+    @staticmethod
+    def validate_title(value):
+        value = value.strip()
+
+        if len(value) < 3:
+            raise serializers.ValidationError("Title must be at least 3 characters.")
+
+        return value
+
+    @staticmethod
+    def validate_description(value):
+        value = value.strip()
+
+        if len(value) < 10:
+            raise serializers.ValidationError(
+                "Description must be at least 10 characters."
+            )
+
+        return value
