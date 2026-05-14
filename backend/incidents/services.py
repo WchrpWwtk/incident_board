@@ -1,3 +1,4 @@
+from core.exceptions import WorkflowValidationError
 from incidents.models import IncidentActivityLog
 
 
@@ -29,16 +30,20 @@ def validate_status_transition(*, old_status, new_status, user_role):
 
     if new_status == "cancelled":
         if user_role not in ["admin", "manager"]:
-            raise ValueError("You do not have permission to cancel this incident.")
+            raise WorkflowValidationError(
+                "You do not have permission to cancel this incident."
+            )
 
         return
 
     allowed_roles = WORKFLOW_TRANSITIONS.get((old_status, new_status))
 
     if not allowed_roles:
-        raise ValueError(
+        raise WorkflowValidationError(
             f"Invalid status transition from {old_status} to {new_status}."
         )
 
     if user_role not in allowed_roles:
-        raise ValueError("You do not have permission to perform this action.")
+        raise WorkflowValidationError(
+            "You do not have permission to perform this action."
+        )
