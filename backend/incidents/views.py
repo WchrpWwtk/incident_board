@@ -39,11 +39,21 @@ class IncidentViewSet(viewsets.ModelViewSet):
     ordering = ("-created_at",)
 
     def get_queryset(self):
-        return (
+        user = self.request.user
+
+        queryset = (
             Incident.objects.select_related("created_by", "assigned_to", "updated_by")
             .filter(is_archived=False)
             .order_by("-created_at")
         )
+
+        if user.role in ["admin", "manager"]:
+            return queryset
+
+        if user.role == "processor":
+            return queryset.filter(assigned_to=user)
+
+        return queryset.filter(created_by=user)
 
     def get_serializer_class(self):
         if self.action == "list":
