@@ -1,6 +1,8 @@
-from core.exceptions import WorkflowValidationError
-from incidents.models import IncidentActivityLog
+import csv
+import io
 
+from core.exceptions import WorkflowValidationError
+from incidents.models import IncidentActivityLog, Incident
 
 WORKFLOW_TRANSITIONS = {
     ("new", "in_progress"): ["processor", "admin"],
@@ -47,3 +49,38 @@ def validate_status_transition(*, old_status, new_status, user_role):
         raise WorkflowValidationError(
             "You do not have permission to perform this action."
         )
+
+
+def build_incidents_csv(incidents):
+    buffer = io.StringIO()
+
+    writer = csv.writer(buffer)
+
+    writer.writerow(
+        [
+            "ID",
+            "Title",
+            "Status",
+            "Priority",
+            "Created By",
+            "Assigned To",
+            "Created At",
+            "Updated At",
+        ]
+    )
+
+    for incident in incidents:
+        writer.writerow(
+            [
+                incident.id,
+                incident.title,
+                incident.status,
+                incident.priority,
+                incident.created_by.username if incident.created_by else "",
+                incident.assigned_to.username if incident.assigned_to else "",
+                incident.created_at.isoformat(),
+                incident.updated_at.isoformat(),
+            ]
+        )
+
+    return buffer.getvalue()
