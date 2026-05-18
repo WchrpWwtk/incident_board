@@ -1,7 +1,9 @@
 from django.db import transaction
-from rest_framework import viewsets, status
+from django.db.models import Count
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from incidents.models import Incident, IncidentActivityLog, IncidentComment
 from incidents.permissions import IncidentPermission
@@ -14,6 +16,7 @@ from incidents.serializers import (
     IncidentCommentCreateSerializer,
     IncidentAttachmentSerializer,
     IncidentAttachmentCreateSerializer,
+    DashboardSerializer,
 )
 from incidents.services import create_activity_log, validate_status_transition
 
@@ -273,3 +276,52 @@ class IncidentCommentViewSet(viewsets.GenericViewSet):
         )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DashboardView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        queryset = Incident.objects.filter(is_archived=False)
+
+        user = request.user
+
+        if user.role == "processor":
+            queryset = queryset.filter(assigned_to=user)
+
+        elif user.role == "reporter":
+            queryset = queryset.filter(created_by=user)
+
+        total_incidents = queryset.count()
+
+        total_open_incidents = queryset.exclude(
+            status__in=["closed", "cancelled"]
+        ).count()
+
+        total_closed_incidents = queryset.filter(status="closed").count()
+
+        total_critical_incidents = queryset.filter(priority="critical").count()
+
+        status_counts = queryset.values("status").annotate(count=Count("id"))
+
+        priority_counts = queryset.values("priority").annotate(count=Count("id"))
+
+        incidents_by_status = {item["status"]: item["count"] for item in status_counts}
+
+        incidents_by_priority = {
+            item["priority"]: item["count"] for item in priority_counts
+        }
+
+        serializer = DashboardSerializer(
+            {
+                "total_incidents": total_incidents,
+                "total_open_incidents": total_open_incidents,
+                "total_closed_incidents": total_closed_incidents,
+                "total_critical_incidents": total_critical_incidents,
+                "incidents_by_status": incidents_by_status,
+                "incidents_by_priority": incidents_by_priority,
+            }
+        )
+
+        return Response(serializer.data)

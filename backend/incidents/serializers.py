@@ -196,3 +196,14 @@ class IncidentAttachmentCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("File size must not exceed 10 MB.")
 
         return value
+
+
+class DashboardSerializer(serializers.Serializer):
+    total_incidents = serializers.IntegerField()
+    total_open_incidents = serializers.IntegerField()
+    total_closed_incidents = serializers.IntegerField()
+    total_critical_incidents = serializers.IntegerField()
+
+    incidents_by_status = serializers.DictField(child=serializers.IntegerField())
+
+    incidents_by_priority = serializers.DictField(child=serializers.IntegerField())
