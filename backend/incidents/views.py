@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Count
+from django.http import HttpResponse
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,7 +19,11 @@ from incidents.serializers import (
     IncidentAttachmentCreateSerializer,
     DashboardSerializer,
 )
-from incidents.services import create_activity_log, validate_status_transition
+from incidents.services import (
+    create_activity_log,
+    validate_status_transition,
+    build_incidents_csv,
+)
 
 
 class IncidentViewSet(viewsets.ModelViewSet):
@@ -325,3 +330,37 @@ class DashboardView(APIView):
         )
 
         return Response(serializer.data)
+
+
+class ReportExportView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        queryset = (
+            Incident.objects.select_related("created_by", "assigned_to")
+            .filter(is_archived=False)
+            .order_by("-created_at")
+        )
+
+        if user.role == "processor":
+            queryset = queryset.filter(assigned_to=user)
+        elif user.role == "reporter":
+            queryset = queryset.filter(created_by=user)
+
+        status_filter = request.data.get("status")
+        priority_filter = request.data.get("priority")
+
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        if priority_filter:
+            queryset = queryset.filter(priority=priority_filter)
+
+        csv_content = build_incidents_csv(queryset)
+
+        response = HttpResponse(csv_content, content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="incident-report.csv"'
+
+        return response
