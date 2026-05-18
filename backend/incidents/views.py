@@ -12,6 +12,8 @@ from incidents.serializers import (
     IncidentUpdateSerializer,
     IncidentCommentSerializer,
     IncidentCommentCreateSerializer,
+    IncidentAttachmentSerializer,
+    IncidentAttachmentCreateSerializer,
 )
 from incidents.services import create_activity_log, validate_status_transition
 
@@ -202,6 +204,38 @@ class IncidentViewSet(viewsets.ModelViewSet):
         )
 
         response_serializer = IncidentCommentSerializer(comment)
+
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["get", "post"], url_path="attachments")
+    @transaction.atomic
+    def attachments(self, request, pk=None):
+        incident = self.get_object()
+
+        if request.method == "GET":
+            attachments = incident.attachments.select_related("uploaded_by").order_by(
+                "-uploaded_at"
+            )
+
+            serializer = IncidentAttachmentSerializer(attachments, many=True)
+
+            return Response(serializer.data)
+
+        serializer = IncidentAttachmentCreateSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        attachment = serializer.save(incident=incident, uploaded_by=request.user)
+
+        create_activity_log(
+            incident=incident,
+            user=request.user,
+            action=IncidentActivityLog.Action.ATTACHMENT_UPLOADED,
+            field_name="attachment",
+            new_value=attachment.original_name,
+        )
+
+        response_serializer = IncidentAttachmentSerializer(attachment)
 
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 

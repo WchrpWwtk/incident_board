@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserSummarySerializer
-from incidents.models import Incident, IncidentComment
+from incidents.models import Incident, IncidentComment, IncidentAttachment
 
 
 class IncidentListSerializer(serializers.ModelSerializer):
@@ -153,5 +153,46 @@ class IncidentCommentCreateSerializer(serializers.ModelSerializer):
 
         if len(value) < 2:
             raise serializers.ValidationError("Comment must be at least 2 characters.")
+
+        return value
+
+
+class IncidentAttachmentSerializer(serializers.ModelSerializer):
+    uploaded_by = UserSummarySerializer(read_only=True)
+
+    class Meta:
+        model = IncidentAttachment
+        fields = (
+            "id",
+            "incident",
+            "uploaded_by",
+            "file",
+            "original_name",
+            "content_type",
+            "size",
+            "uploaded_at",
+        )
+        read_only_fields = (
+            "id",
+            "incident",
+            "uploaded_by",
+            "original_name",
+            "content_type",
+            "size",
+            "uploaded_at",
+        )
+
+
+class IncidentAttachmentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IncidentAttachment
+        fields = ("file",)
+
+    @staticmethod
+    def validate_file(value):
+        max_size = 10 * 1024 * 1024
+
+        if value.size > max_size:
+            raise serializers.ValidationError("File size must not exceed 10 MB.")
 
         return value
