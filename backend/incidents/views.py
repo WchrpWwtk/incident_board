@@ -392,3 +392,17 @@ class ReportExportView(APIView):
         response["Content-Disposition"] = 'attachment; filename="incident-report.csv"'
 
         return response
+
+
+class SentryTestView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        division_by_zero = 1 / 0
+
+        return Response(
+            {
+                "message": division_by_zero,
+            }
+        )

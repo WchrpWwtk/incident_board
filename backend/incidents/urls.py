@@ -6,6 +6,7 @@ from incidents.views import (
     IncidentCommentViewSet,
     DashboardView,
     ReportExportView,
+    SentryTestView,
 )
 
 router = DefaultRouter()
@@ -15,4 +16,5 @@ router.register("comments", IncidentCommentViewSet, basename="comment")
 urlpatterns = [
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("reports/export/", ReportExportView.as_view(), name="report-export"),
+    path("sentry-test/", SentryTestView.as_view(), name="sentry-test"),
 ] + router.urls
