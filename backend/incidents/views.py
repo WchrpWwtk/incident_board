@@ -6,7 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from incidents.models import Incident, IncidentActivityLog, IncidentComment
+from incidents.models import (
+    Incident,
+    IncidentActivityLog,
+    IncidentComment,
+    ReportExport,
+)
 from incidents.permissions import IncidentPermission
 from incidents.serializers import (
     IncidentListSerializer,
@@ -335,7 +340,8 @@ class DashboardView(APIView):
 class ReportExportView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         user = request.user
 
         queryset = (
@@ -358,9 +364,31 @@ class ReportExportView(APIView):
         if priority_filter:
             queryset = queryset.filter(priority=priority_filter)
 
-        csv_content = build_incidents_csv(queryset)
+        report = ReportExport.objects.create(
+            exported_by=user,
+            filters={
+                "status": status_filter,
+                "priority": priority_filter,
+            },
+            status=ReportExport.Status.PROCESSING,
+        )
 
-        response = HttpResponse(csv_content, content_type="text/csv")
+        try:
+            csv_content = build_incidents_csv(queryset)
+
+            report.status = ReportExport.Status.SUCCESS
+            report.row_count = queryset.count()
+            report.save(update_fields=["status", "row_count"])
+        except Exception as exc:
+            report.status = ReportExport.Status.FAILED
+            report.error_message = str(exc)
+            report.save(update_fields=["status", "error_message"])
+            raise
+
+        response = HttpResponse(
+            csv_content,
+            content_type="text/csv",
+        )
         response["Content-Disposition"] = 'attachment; filename="incident-report.csv"'
 
         return response
