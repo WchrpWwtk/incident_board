@@ -5,6 +5,7 @@ from incidents.models import (
     IncidentActivityLog,
     IncidentComment,
     IncidentAttachment,
+    ReportExport,
 )
 
 
@@ -105,3 +106,23 @@ class IncidentAttachmentAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ("uploaded_at",)
+
+
+@admin.register(ReportExport)
+class ReportExportAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "exported_by",
+        "status",
+        "row_count",
+        "exported_at",
+    )
+
+    list_filter = (
+        "status",
+        "exported_at",
+    )
+
+    search_fields = ("exported_by__username",)
+
+    readonly_fields = ("exported_at",)

@@ -166,3 +166,33 @@ class IncidentAttachment(models.Model):
             self.content_type = getattr(self.file.file, "content_type", "")
 
         super().save(*args, **kwargs)
+
+
+class ReportExport(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        SUCCESS = "success", "Success"
+        FAILED = "failed", "Failed"
+
+    exported_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    filters = models.JSONField(default=dict, blank=True)
+
+    file = models.FileField(upload_to="report_exports/", null=True, blank=True)
+
+    status = models.CharField(max_length=20, choices=Status, default=Status.PENDING)
+
+    row_count = models.PositiveIntegerField(default=0)
+
+    error_message = models.TextField(null=True, blank=True)
+
+    exported_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-exported_at"]
+
+    def __str__(self):
+        return f"ReportExport #{self.id} - {self.status}"
