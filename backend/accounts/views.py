@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -47,3 +48,13 @@ class LoginView(APIView):
         )
 
         return response
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        serializer = UserSummarySerializer(request.user)
+
+        return Response(serializer.data)
