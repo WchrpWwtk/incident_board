@@ -2,6 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import { getIncidents } from "@/features/incidents/incident.api.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router-dom";
+import type {
+	IncidentPriority,
+	IncidentStatus,
+} from "@/features/incidents/incident.types.ts";
+import { Badge } from "@/components/ui/badge.tsx";
+
+function formatStatus(status: IncidentStatus) {
+	return status.replaceAll("_", " ");
+}
+
+function getPriorityVariant(priority: IncidentPriority) {
+	if (priority === "critical") return "destructive";
+
+	return "secondary";
+}
 
 export function IncidentListPage() {
 	const incidentsQuery = useQuery({
@@ -59,9 +74,24 @@ export function IncidentListPage() {
 						<tbody>
 							{incidents.map((incident) => (
 								<tr key={incident.id} className="border-b last:border-0">
-									<td className="px-4 py-3 font-medium">{incident.title}</td>
-									<td className="px-4 py-3">{incident.status}</td>
-									<td className="px-4 py-3">{incident.priority}</td>
+									<td className="px-4 py-3 font-medium">
+										<Link
+											className="hover:underline"
+											to={`/incidents/${incident.id}`}
+										>
+											{incident.title}
+										</Link>
+									</td>
+									<td className="px-4 py-3">
+										<Badge variant="outline">
+											{formatStatus(incident.status)}
+										</Badge>
+									</td>
+									<td className="px-4 py-3">
+										<Badge variant={getPriorityVariant(incident.priority)}>
+											{incident.priority}
+										</Badge>
+									</td>
 									<td className="px-4 py-3">{incident.created_by.username}</td>
 									<td className="px-4 py-3">
 										{new Date(incident.created_at).toLocaleString()}
