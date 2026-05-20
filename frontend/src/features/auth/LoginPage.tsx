@@ -17,8 +17,10 @@ import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { useAuth } from "@/features/auth/auth.store.tsx";
+import { useNavigate } from "react-router-dom";
 
 export function LoginPage() {
+	const navigate = useNavigate();
 	const { setUser } = useAuth();
 	const form = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),
@@ -32,6 +34,7 @@ export function LoginPage() {
 		mutationFn: login,
 		onSuccess: (data) => {
 			setUser(data.user);
+			navigate("/dashboard");
 		},
 	});
 
