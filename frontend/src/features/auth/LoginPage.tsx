@@ -16,8 +16,10 @@ import {
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { useAuth } from "@/features/auth/auth.store.tsx";
 
 export function LoginPage() {
+	const { setUser } = useAuth();
 	const form = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: {
@@ -29,7 +31,7 @@ export function LoginPage() {
 	const loginMutation = useMutation({
 		mutationFn: login,
 		onSuccess: (data) => {
-			console.log("Logged in user:", data.user);
+			setUser(data.user);
 		},
 	});
 
