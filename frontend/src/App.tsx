@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/auth.store.tsx";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { DashboardPage } from "@/features/dashboard/DashboardPage.tsx";
 import { AppLayout } from "@/components/layout/AppLayout.tsx";
+import { IncidentListPage } from "@/features/incidents/IncidentListPage.tsx";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	const { isAuthenticated } = useAuth();
@@ -27,6 +28,7 @@ function App() {
 				}
 			>
 				<Route path="/dashboard" element={<DashboardPage />} />
+				<Route path="/incidents" element={<IncidentListPage />} />
 			</Route>
 			<Route path="*" element={<Navigate to="/dashboard" replace />} />
 		</Routes>
