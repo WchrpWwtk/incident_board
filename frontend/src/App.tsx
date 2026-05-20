@@ -1,11 +1,7 @@
-import { Button } from "@/components/ui/button.tsx";
+import { LoginPage } from "@/features/auth/LoginPage.tsx";
 
 function App() {
-	return (
-		<div className="flex min-h-screen items-center justify-center">
-			<Button>Hello IncidentBoard</Button>
-		</div>
-	);
+	return <LoginPage />;
 }
 
 export default App;
