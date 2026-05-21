@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/layout/AppLayout.tsx";
 import { IncidentListPage } from "@/features/incidents/IncidentListPage.tsx";
 import { IncidentDetailPage } from "@/features/incidents/IncidentDetailPage.tsx";
 import { CreateIncidentPage } from "@/features/incidents/CreateIncidentPage.tsx";
+import { EditIncidentPage } from "@/features/incidents/EditIncidentPage.tsx";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	const { isAuthenticated } = useAuth();
@@ -33,6 +34,7 @@ function App() {
 				<Route path="/incidents" element={<IncidentListPage />} />
 				<Route path="/incidents/new" element={<CreateIncidentPage />} />
 				<Route path="/incidents/:id" element={<IncidentDetailPage />} />
+				<Route path="/incidents/:id/edit" element={<EditIncidentPage />} />
 			</Route>
 			<Route path="*" element={<Navigate to="/dashboard" replace />} />
 		</Routes>
