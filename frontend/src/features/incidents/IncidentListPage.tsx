@@ -1,5 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { getIncidents } from "@/features/incidents/incident.api.ts";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+	exportIncidents,
+	getIncidents,
+} from "@/features/incidents/incident.api.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router-dom";
 import type {
@@ -35,6 +38,24 @@ export function IncidentListPage() {
 			}),
 	});
 
+	const exportMutation = useMutation({
+		mutationFn: () =>
+			exportIncidents({
+				status: statusFilter || undefined,
+				priority: priorityFilter || undefined,
+			}),
+		onSuccess: (blob) => {
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+
+			link.href = url;
+			link.download = "incident-report.csv";
+			link.click();
+
+			window.URL.revokeObjectURL(url);
+		},
+	});
+
 	if (incidentsQuery.isLoading) {
 		return (
 			<p className="text-sm text-muted-foreground">Loading incidents...</p>
@@ -62,9 +83,19 @@ export function IncidentListPage() {
 						Manage and track operational incidents.
 					</p>
 				</div>
-				<Button asChild>
-					<Link to="/incidents/new">Create Incident</Link>
-				</Button>
+				<div className="flex gap-2">
+					<Button asChild>
+						<Link to="/incidents/new">Create Incident</Link>
+					</Button>
+					<Button
+						type="button"
+						variant="outline"
+						disabled={exportMutation.isPending}
+						onClick={() => exportMutation.mutate()}
+					>
+						{exportMutation.isPending ? "Exporting..." : "Export CSV"}
+					</Button>
+				</div>
 			</div>
 			<div className="grid gap-4 md:grid-cols-3">
 				<Input

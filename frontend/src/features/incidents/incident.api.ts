@@ -15,6 +15,11 @@ type GetIncidentsParams = {
 	priority?: string;
 };
 
+type ExportIncidentParams = {
+	status?: string;
+	priority?: string;
+};
+
 export async function getIncidents(
 	params?: GetIncidentsParams,
 ): Promise<PaginatedResponse<Incident>> {
@@ -53,6 +58,16 @@ export async function updateIncidentStatus(
 	status: IncidentStatus,
 ): Promise<Incident> {
 	const response = await api.patch<Incident>(`/incidents/${id}/`, { status });
+
+	return response.data;
+}
+
+export async function exportIncidents(
+	params: ExportIncidentParams,
+): Promise<Blob> {
+	const response = await api.post("/reports/export/", params, {
+		responseType: "blob",
+	});
 
 	return response.data;
 }
