@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge.tsx";
 import type { IncidentStatus } from "@/features/incidents/incident.types.ts";
 import { getWorkflowActions } from "@/features/incidents/incident.workflow.ts";
 import { useAuth } from "@/features/auth/auth.store.tsx";
+import { IncidentComments } from "@/features/incidents/IncidentComments.tsx";
 
 export function IncidentDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -129,6 +130,7 @@ export function IncidentDetailPage() {
 					</div>
 				</div>
 			</div>
+			<IncidentComments incidentId={incident.id} />
 		</div>
 	);
 }
