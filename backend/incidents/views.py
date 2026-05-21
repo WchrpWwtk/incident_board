@@ -23,6 +23,7 @@ from incidents.serializers import (
     IncidentAttachmentSerializer,
     IncidentAttachmentCreateSerializer,
     DashboardSerializer,
+    IncidentActivityLogSerializer,
 )
 from incidents.services import (
     create_activity_log,
@@ -251,6 +252,16 @@ class IncidentViewSet(viewsets.ModelViewSet):
         response_serializer = IncidentAttachmentSerializer(attachment)
 
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["get"], url_path="activity-logs")
+    def activity_logs(self, _request, pk=None):
+        incident = self.get_object()
+
+        logs = incident.activity_logs.select_related("user").order_by("-created_at")
+
+        serializer = IncidentActivityLogSerializer(logs, many=True)
+
+        return Response(serializer.data)
 
 
 class IncidentCommentViewSet(viewsets.GenericViewSet):

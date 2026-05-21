@@ -1,7 +1,12 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserSummarySerializer
-from incidents.models import Incident, IncidentComment, IncidentAttachment
+from incidents.models import (
+    Incident,
+    IncidentComment,
+    IncidentAttachment,
+    IncidentActivityLog,
+)
 
 
 class IncidentListSerializer(serializers.ModelSerializer):
@@ -207,3 +212,20 @@ class DashboardSerializer(serializers.Serializer):
     incidents_by_status = serializers.DictField(child=serializers.IntegerField())
 
     incidents_by_priority = serializers.DictField(child=serializers.IntegerField())
+
+
+class IncidentActivityLogSerializer(serializers.ModelSerializer):
+    user = UserSummarySerializer(read_only=True)
+
+    class Meta:
+        model = IncidentActivityLog
+        fields = (
+            "id",
+            "incident",
+            "user",
+            "action",
+            "field_name",
+            "old_value",
+            "new_value",
+            "created_at",
+        )
