@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	deleteIncidentAttachment,
 	getIncidentAttachments,
 	uploadIncidentAttachment,
 } from "@/features/incidents/incident.api.ts";
@@ -49,6 +50,19 @@ export function IncidentAttachments({ incidentId }: Props) {
 			if (inputRef.current) {
 				inputRef.current.value = "";
 			}
+		},
+	});
+
+	const deleteMutation = useMutation({
+		mutationFn: deleteIncidentAttachment,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: ["incidents", incidentId, "attachments"],
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: ["incidents", incidentId, "activity-logs"],
+			});
 		},
 	});
 
@@ -122,6 +136,14 @@ export function IncidentAttachments({ incidentId }: Props) {
 										{new Date(attachment.uploaded_at).toLocaleString()}
 									</p>
 								</div>
+								<Button
+									size="sm"
+									variant="destructive"
+									disabled={deleteMutation.isPending}
+									onClick={() => deleteMutation.mutate(attachment.id)}
+								>
+									Delete
+								</Button>
 							</div>
 						))
 					)}

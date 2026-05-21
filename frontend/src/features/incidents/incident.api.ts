@@ -140,3 +140,9 @@ export async function uploadIncidentAttachment(
 
 	return response.data;
 }
+
+export async function deleteIncidentAttachment(
+	attachmentId: number,
+): Promise<void> {
+	await api.delete(`/attachments/${attachmentId}/`);
+}
