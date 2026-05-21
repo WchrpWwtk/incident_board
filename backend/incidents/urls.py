@@ -6,7 +6,8 @@ from incidents.views import (
     IncidentCommentViewSet,
     DashboardView,
     ReportExportView,
-    SentryTestView, IncidentAttachmentViewSet,
+    SentryTestView,
+    IncidentAttachmentViewSet,
 )
 
 router = DefaultRouter()

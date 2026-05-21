@@ -321,7 +321,12 @@ class IncidentAttachmentViewSet(viewsets.GenericViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        file_field = attachment.file
+
         attachment.delete()
+
+        if file_field:
+            file_field.delete(save=False)
 
         create_activity_log(
             incident=incident,
