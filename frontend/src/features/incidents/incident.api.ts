@@ -1,5 +1,6 @@
 import type {
 	Incident,
+	IncidentComment,
 	IncidentStatus,
 	PaginatedResponse,
 } from "@/features/incidents/incident.types.ts";
@@ -70,4 +71,30 @@ export async function exportIncidents(
 	});
 
 	return response.data;
+}
+
+export async function getIncidentComments(
+	incidentId: number,
+): Promise<IncidentComment[]> {
+	const response = await api.get<IncidentComment[]>(
+		`/incidents/${incidentId}/comments/`,
+	);
+
+	return response.data;
+}
+
+export async function createIncidentComment(
+	incidentId: number,
+	body: string,
+): Promise<IncidentComment> {
+	const response = await api.post<IncidentComment>(
+		`/incidents/${incidentId}/comments/`,
+		{ body },
+	);
+
+	return response.data;
+}
+
+export async function deleteIncidentComment(commentId: number): Promise<void> {
+	await api.delete(`/comments/${commentId}/`);
 }

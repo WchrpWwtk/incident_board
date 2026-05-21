@@ -30,3 +30,12 @@ export type PaginatedResponse<T> = {
 	previous: string | null;
 	results: T[];
 };
+
+export type IncidentComment = {
+	id: number;
+	incident: number;
+	user: User;
+	body: string;
+	created_at: string;
+	updated_at: string;
+};
