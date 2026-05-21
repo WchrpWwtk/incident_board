@@ -6,12 +6,13 @@ from incidents.views import (
     IncidentCommentViewSet,
     DashboardView,
     ReportExportView,
-    SentryTestView,
+    SentryTestView, IncidentAttachmentViewSet,
 )
 
 router = DefaultRouter()
 router.register("incidents", IncidentViewSet, basename="incident")
 router.register("comments", IncidentCommentViewSet, basename="comment")
+router.register("attachments", IncidentAttachmentViewSet, basename="attachment")
 
 urlpatterns = [
     path("dashboard/", DashboardView.as_view(), name="dashboard"),

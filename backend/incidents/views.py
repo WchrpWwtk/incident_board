@@ -11,6 +11,7 @@ from incidents.models import (
     IncidentActivityLog,
     IncidentComment,
     ReportExport,
+    IncidentAttachment,
 )
 from incidents.permissions import IncidentPermission
 from incidents.serializers import (
@@ -293,6 +294,41 @@ class IncidentCommentViewSet(viewsets.GenericViewSet):
             action=IncidentActivityLog.Action.COMMENT_DELETED,
             field_name="comment",
             old_value=comment_body,
+            new_value=None,
+        )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IncidentAttachmentViewSet(viewsets.GenericViewSet):
+    queryset = IncidentAttachment.objects.select_related("incident", "uploaded_by")
+
+    permission_classes = [IncidentPermission]
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        attachment = self.get_object()
+
+        incident = attachment.incident
+        original_name = attachment.original_name
+
+        if (
+            request.user.role not in ["admin", "manager"]
+            and attachment.uploaded_by_id != request.user.id
+        ):
+            return Response(
+                {"detail": "You do not have permission to delete this attachment."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        attachment.delete()
+
+        create_activity_log(
+            incident=incident,
+            user=request.user,
+            action=IncidentActivityLog.Action.ATTACHMENT_DELETED,
+            field_name="attachment",
+            old_value=original_name,
             new_value=None,
         )
 

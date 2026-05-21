@@ -79,6 +79,7 @@ class IncidentActivityLog(models.Model):
         ASSIGNED = "assigned", "Assigned"
         COMMENTED = "commented", "Commented"
         ATTACHMENT_UPLOADED = "attachment_uploaded", "Attachment Uploaded"
+        ATTACHMENT_DELETED = "attachment_deleted", "Attachment Deleted"
         RETURNED = "returned", "Returned"
         RESOLVED = "resolved", "Resolved"
         CANCELLED = "cancelled", "Cancelled"
