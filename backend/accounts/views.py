@@ -58,3 +58,19 @@ class ProfileView(APIView):
         serializer = UserSummarySerializer(request.user)
 
         return Response(serializer.data)
+
+
+class LogoutView(APIView):
+    permission_classes = []
+
+    @staticmethod
+    def post(_request):
+        response = Response(
+            {"detail": "Logged out successfully"}, status=status.HTTP_200_OK
+        )
+
+        response.delete_cookie("access_token", samesite="Lax")
+
+        response.delete_cookie("refresh_token", samesite="Lax")
+
+        return response
