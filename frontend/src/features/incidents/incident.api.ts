@@ -9,3 +9,9 @@ export async function getIncidents(): Promise<PaginatedResponse<Incident>> {
 
 	return response.data;
 }
+
+export async function getIncident(id: string): Promise<Incident> {
+	const response = await api.get<Incident>(`/incidents/${id}/`);
+
+	return response.data;
+}
