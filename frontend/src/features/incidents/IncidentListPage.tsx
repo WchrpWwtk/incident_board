@@ -7,6 +7,8 @@ import type {
 	IncidentStatus,
 } from "@/features/incidents/incident.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
+import { useState } from "react";
+import { Input } from "@/components/ui/input.tsx";
 
 function formatStatus(status: IncidentStatus) {
 	return status.replaceAll("_", " ");
@@ -19,9 +21,18 @@ function getPriorityVariant(priority: IncidentPriority) {
 }
 
 export function IncidentListPage() {
+	const [search, setSearch] = useState("");
+	const [statusFilter, setStatusFilter] = useState("");
+	const [priorityFilter, setPriorityFilter] = useState("");
+
 	const incidentsQuery = useQuery({
-		queryKey: ["incidents"],
-		queryFn: getIncidents,
+		queryKey: ["incidents", search, statusFilter, priorityFilter],
+		queryFn: () =>
+			getIncidents({
+				search: search || undefined,
+				status: statusFilter || undefined,
+				priority: priorityFilter || undefined,
+			}),
 	});
 
 	if (incidentsQuery.isLoading) {
@@ -54,6 +65,38 @@ export function IncidentListPage() {
 				<Button asChild>
 					<Link to="/incidents/new">Create Incident</Link>
 				</Button>
+			</div>
+			<div className="grid gap-4 md:grid-cols-3">
+				<Input
+					className="h-10 rounded-md border bg-background px-3 text-sm"
+					placeholder="Search incidents..."
+					value={search}
+					onChange={(event) => setSearch(event.target.value)}
+				/>
+				<select
+					className="h-10 rounded-md border bg-background px-3 text-sm"
+					value={statusFilter}
+					onChange={(event) => setStatusFilter(event.target.value)}
+				>
+					<option value="">All Statuses</option>
+					<option value="new">New</option>
+					<option value="in_progress">In Progress</option>
+					<option value="pending_manager_review">Pending Manager Review</option>
+					<option value="resolved">Resolved</option>
+					<option value="closed">Closed</option>
+					<option value="cancelled">Cancelled</option>
+				</select>
+				<select
+					className="h-10 rounded-md border bg-background px-3 text-sm"
+					value={priorityFilter}
+					onChange={(event) => setPriorityFilter(event.target.value)}
+				>
+					<option value="">All Priorities</option>
+					<option value="low">Low</option>
+					<option value="medium">Medium</option>
+					<option value="high">High</option>
+					<option value="critical">Critical</option>
+				</select>
 			</div>
 			{incidents.length === 0 ? (
 				<div className="rounded-lg border bg-background p-8 text-center">

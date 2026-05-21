@@ -9,8 +9,18 @@ import type {
 	UpdateIncidentFormValues,
 } from "@/features/incidents/incident.schema.ts";
 
-export async function getIncidents(): Promise<PaginatedResponse<Incident>> {
-	const response = await api.get<PaginatedResponse<Incident>>("/incidents/");
+type GetIncidentsParams = {
+	search?: string;
+	status?: string;
+	priority?: string;
+};
+
+export async function getIncidents(
+	params?: GetIncidentsParams,
+): Promise<PaginatedResponse<Incident>> {
+	const response = await api.get<PaginatedResponse<Incident>>("/incidents/", {
+		params,
+	});
 
 	return response.data;
 }
