@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import type { IncidentStatus } from "@/features/incidents/incident.types.ts";
 import { getWorkflowActions } from "@/features/incidents/incident.workflow.ts";
+import { useAuth } from "@/features/auth/auth.store.tsx";
 
 export function IncidentDetailPage() {
 	const { id } = useParams<{ id: string }>();
+	const { user } = useAuth();
 
 	const incidentQuery = useQuery({
 		queryKey: ["incidents", id],
@@ -51,7 +53,7 @@ export function IncidentDetailPage() {
 
 	const incident = incidentQuery.data;
 
-	const workflowActions = getWorkflowActions(incident);
+	const workflowActions = getWorkflowActions(incident, user);
 
 	return (
 		<div className="space-y-6">
