@@ -10,6 +10,7 @@ import type { IncidentStatus } from "@/features/incidents/incident.types.ts";
 import { getWorkflowActions } from "@/features/incidents/incident.workflow.ts";
 import { useAuth } from "@/features/auth/auth.store.tsx";
 import { IncidentComments } from "@/features/incidents/IncidentComments.tsx";
+import { IncidentActivityTimeline } from "@/features/incidents/IncidentActivityTimeline.tsx";
 
 export function IncidentDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -131,6 +132,7 @@ export function IncidentDetailPage() {
 				</div>
 			</div>
 			<IncidentComments incidentId={incident.id} />
+			<IncidentActivityTimeline incidentId={incident.id} />
 		</div>
 	);
 }

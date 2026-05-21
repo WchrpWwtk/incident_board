@@ -1,5 +1,6 @@
 import type {
 	Incident,
+	IncidentActivityLog,
 	IncidentComment,
 	IncidentStatus,
 	PaginatedResponse,
@@ -97,4 +98,14 @@ export async function createIncidentComment(
 
 export async function deleteIncidentComment(commentId: number): Promise<void> {
 	await api.delete(`/comments/${commentId}/`);
+}
+
+export async function getIncidentActivityLogs(
+	incidentId: number,
+): Promise<IncidentActivityLog[]> {
+	const response = await api.get<IncidentActivityLog[]>(
+		`/incidents/${incidentId}/activity-logs/`,
+	);
+
+	return response.data;
 }

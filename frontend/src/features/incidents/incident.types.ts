@@ -39,3 +39,14 @@ export type IncidentComment = {
 	created_at: string;
 	updated_at: string;
 };
+
+export type IncidentActivityLog = {
+	id: number;
+	incident: number;
+	user: User | null;
+	action: string;
+	field_name: string | null;
+	old_value: string | null;
+	new_value: string | null;
+	created_at: string;
+};
