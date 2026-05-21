@@ -1,8 +1,13 @@
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getIncident } from "@/features/incidents/incident.api.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	getIncident,
+	updateIncidentStatus,
+} from "@/features/incidents/incident.api.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
+import type { IncidentStatus } from "@/features/incidents/incident.types.ts";
+import { getWorkflowActions } from "@/features/incidents/incident.workflow.ts";
 
 export function IncidentDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -11,6 +16,22 @@ export function IncidentDetailPage() {
 		queryKey: ["incidents", id],
 		queryFn: () => getIncident(id!),
 		enabled: Boolean(id),
+	});
+
+	const queryClient = useQueryClient();
+
+	const statusMutation = useMutation({
+		mutationFn: (nextStatus: IncidentStatus) =>
+			updateIncidentStatus(incident.id, nextStatus),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: ["incidents"],
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: ["incidents", id],
+			});
+		},
 	});
 
 	if (incidentQuery.isLoading) {
@@ -29,6 +50,8 @@ export function IncidentDetailPage() {
 	}
 
 	const incident = incidentQuery.data;
+
+	const workflowActions = getWorkflowActions(incident);
 
 	return (
 		<div className="space-y-6">
@@ -60,6 +83,28 @@ export function IncidentDetailPage() {
 							{incident.priority}
 						</Badge>
 					</div>
+					{workflowActions.length > 0 && (
+						<div className="mt-6 rounded-lg border bg-muted/30 p-4">
+							<h2 className="text-sm font-medium">Workflow Actions</h2>
+							<div className="mt-3 flex flex-wrap gap-2">
+								{workflowActions.map((action) => (
+									<Button
+										key={action.nextStatus}
+										type="button"
+										disabled={statusMutation.isPending}
+										onClick={() => statusMutation.mutate(action.nextStatus)}
+									>
+										{action.label}
+									</Button>
+								))}
+							</div>
+							{statusMutation.isError && (
+								<p className="mt-3 text-sm text-destructive">
+									You do not have permission to perform this workflow action.
+								</p>
+							)}
+						</div>
+					)}
 				</div>
 				<div className="mt-6">
 					<h2 className="text-sm font-medium">Description</h2>
