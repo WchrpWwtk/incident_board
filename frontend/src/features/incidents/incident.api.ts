@@ -1,5 +1,6 @@
 import type {
 	Incident,
+	IncidentStatus,
 	PaginatedResponse,
 } from "@/features/incidents/incident.types.ts";
 import { api } from "@/lib/api.ts";
@@ -33,6 +34,15 @@ export async function updateIncident(
 	payload: UpdateIncidentFormValues,
 ): Promise<Incident> {
 	const response = await api.patch<Incident>(`/incidents/${id}/`, payload);
+
+	return response.data;
+}
+
+export async function updateIncidentStatus(
+	id: number,
+	status: IncidentStatus,
+): Promise<Incident> {
+	const response = await api.patch<Incident>(`/incidents/${id}/`, { status });
 
 	return response.data;
 }
