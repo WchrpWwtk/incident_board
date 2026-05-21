@@ -1,6 +1,7 @@
 import type {
 	Incident,
 	IncidentActivityLog,
+	IncidentAttachment,
 	IncidentComment,
 	IncidentStatus,
 	PaginatedResponse,
@@ -105,6 +106,36 @@ export async function getIncidentActivityLogs(
 ): Promise<IncidentActivityLog[]> {
 	const response = await api.get<IncidentActivityLog[]>(
 		`/incidents/${incidentId}/activity-logs/`,
+	);
+
+	return response.data;
+}
+
+export async function getIncidentAttachments(
+	incidentId: number,
+): Promise<IncidentAttachment[]> {
+	const response = await api.get<IncidentAttachment[]>(
+		`/incidents/${incidentId}/attachments/`,
+	);
+
+	return response.data;
+}
+
+export async function uploadIncidentAttachment(
+	incidentId: number,
+	file: File,
+): Promise<IncidentAttachment> {
+	const formData = new FormData();
+	formData.append("file", file);
+
+	const response = await api.post<IncidentAttachment>(
+		`/incidents/${incidentId}/attachments/`,
+		formData,
+		{
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		},
 	);
 
 	return response.data;

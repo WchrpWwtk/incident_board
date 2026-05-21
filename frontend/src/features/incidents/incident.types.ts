@@ -50,3 +50,14 @@ export type IncidentActivityLog = {
 	new_value: string | null;
 	created_at: string;
 };
+
+export type IncidentAttachment = {
+	id: number;
+	incident: number;
+	uploaded_by: User | null;
+	file: string;
+	original_name: string;
+	content_type: string;
+	size: number;
+	uploaded_at: string;
+};
