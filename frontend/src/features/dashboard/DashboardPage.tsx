@@ -69,6 +69,44 @@ export function DashboardPage() {
 					</CardContent>
 				</Card>
 			</div>
+			<div className="grid gap-4 md:grid-cols-2">
+				<Card>
+					<CardHeader>
+						<CardTitle>By Status</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-2">
+						{Object.entries(data.incidents_by_status).map(([status, count]) => (
+							<div
+								key={status}
+								className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
+							>
+								<span className="capitalize">
+									{status.replaceAll("_", " ")}
+								</span>
+								<span className="font-medium">{count}</span>
+							</div>
+						))}
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader>
+						<CardTitle>By Priority</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-2">
+						{Object.entries(data.incidents_by_priority).map(
+							([priority, count]) => (
+								<div
+									key={priority}
+									className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
+								>
+									<span className="capitalize">{priority}</span>
+									<span className="font-medium">{count}</span>
+								</div>
+							),
+						)}
+					</CardContent>
+				</Card>
+			</div>
 		</div>
 	);
 }
