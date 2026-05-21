@@ -1,8 +1,22 @@
 import { useAuth } from "@/features/auth/auth.store.tsx";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { logout } from "@/features/auth/auth.api.ts";
+import { Button } from "@/components/ui/button.tsx";
 
 export function AppLayout() {
-	const { user } = useAuth();
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+	const { user, setUser } = useAuth();
+
+	const logoutMutation = useMutation({
+		mutationFn: logout,
+		onSuccess: async () => {
+			setUser(null);
+			queryClient.clear();
+			navigate("/login");
+		},
+	});
 
 	return (
 		<div className="min-h-screen bg-muted/40">
@@ -28,6 +42,14 @@ export function AppLayout() {
 					<span className="text-sm text-muted-foreground">
 						Signed in as {user?.username} ({user?.role})
 					</span>
+					<Button
+						variant="outline"
+						size="sm"
+						disabled={logoutMutation.isPending}
+						onClick={() => logoutMutation.mutate()}
+					>
+						Logout
+					</Button>
 				</header>
 				<main className="p-6">
 					<Outlet />
