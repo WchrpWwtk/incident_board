@@ -36,6 +36,9 @@ export function IncidentDetailPage() {
 				<Button asChild variant="outline">
 					<Link to="/incidents">Back</Link>
 				</Button>
+				<Button asChild>
+					<Link to={`/incidents/${incident.id}/edit`}>Edit</Link>
+				</Button>
 			</div>
 			<div className="rounded-lg border bg-background p-6">
 				<div className="flex items-start justify-between gap-4">
