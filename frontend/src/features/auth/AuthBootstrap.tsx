@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/features/auth/auth.api.ts";
 
 export function AuthBootstrap({ children }: PropsWithChildren) {
-	const { setUser } = useAuth();
+	const { user, setUser } = useAuth();
 
 	const profileQuery = useQuery({
 		queryKey: ["auth", "profile"],
@@ -16,12 +16,24 @@ export function AuthBootstrap({ children }: PropsWithChildren) {
 		if (profileQuery.data) {
 			setUser(profileQuery.data);
 		}
-	}, [profileQuery.data, setUser]);
 
-	if (profileQuery.isLoading) {
+		if (profileQuery.isError) {
+			setUser(null);
+		}
+	}, [profileQuery.data, profileQuery.isError, setUser]);
+
+	if (profileQuery.isLoading || profileQuery.isFetching) {
 		return (
 			<div className="flex min-h-screen items-center justify-center">
 				<p className="text-sm text-muted-foreground">Loading session...</p>
+			</div>
+		);
+	}
+
+	if (profileQuery.data && !user) {
+		return (
+			<div className="flex min-h-screen items-center justify-center">
+				<p className="text-sm text-muted-foreground">Restoring session...</p>
 			</div>
 		);
 	}
