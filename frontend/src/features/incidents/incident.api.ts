@@ -16,6 +16,8 @@ type GetIncidentsParams = {
 	search?: string;
 	status?: string;
 	priority?: string;
+	limit?: number;
+	offset?: number;
 };
 
 type ExportIncidentParams = {

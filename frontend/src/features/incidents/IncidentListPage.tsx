@@ -28,13 +28,20 @@ export function IncidentListPage() {
 	const [statusFilter, setStatusFilter] = useState("");
 	const [priorityFilter, setPriorityFilter] = useState("");
 
+	const pageSize = 10;
+	const [page, setPage] = useState(1);
+
+	const offset = (page - 1) * pageSize;
+
 	const incidentsQuery = useQuery({
-		queryKey: ["incidents", search, statusFilter, priorityFilter],
+		queryKey: ["incidents", search, statusFilter, priorityFilter, page],
 		queryFn: () =>
 			getIncidents({
 				search: search || undefined,
 				status: statusFilter || undefined,
 				priority: priorityFilter || undefined,
+				limit: pageSize,
+				offset,
 			}),
 	});
 
@@ -56,6 +63,21 @@ export function IncidentListPage() {
 		},
 	});
 
+	function handleSearchChange(value: string) {
+		setSearch(value);
+		setPage(1);
+	}
+
+	function handleStatusChange(value: string) {
+		setStatusFilter(value);
+		setPage(1);
+	}
+
+	function handlePriorityChange(value: string) {
+		setPriorityFilter(value);
+		setPage(1);
+	}
+
 	if (incidentsQuery.isLoading) {
 		return (
 			<p className="text-sm text-muted-foreground">Loading incidents...</p>
@@ -73,6 +95,7 @@ export function IncidentListPage() {
 	}
 
 	const incidents = incidentsQuery.data?.results ?? [];
+	const totalCount = incidentsQuery.data?.count ?? 0;
 
 	return (
 		<div className="space-y-6">
@@ -102,12 +125,12 @@ export function IncidentListPage() {
 					className="h-10 rounded-md border bg-background px-3 text-sm"
 					placeholder="Search incidents..."
 					value={search}
-					onChange={(event) => setSearch(event.target.value)}
+					onChange={(event) => handleSearchChange(event.target.value)}
 				/>
 				<select
 					className="h-10 rounded-md border bg-background px-3 text-sm"
 					value={statusFilter}
-					onChange={(event) => setStatusFilter(event.target.value)}
+					onChange={(event) => handleStatusChange(event.target.value)}
 				>
 					<option value="">All Statuses</option>
 					<option value="new">New</option>
@@ -120,7 +143,7 @@ export function IncidentListPage() {
 				<select
 					className="h-10 rounded-md border bg-background px-3 text-sm"
 					value={priorityFilter}
-					onChange={(event) => setPriorityFilter(event.target.value)}
+					onChange={(event) => handlePriorityChange(event.target.value)}
 				>
 					<option value="">All Priorities</option>
 					<option value="low">Low</option>
@@ -174,6 +197,32 @@ export function IncidentListPage() {
 							))}
 						</tbody>
 					</table>
+				</div>
+			)}
+			{totalCount > 0 && (
+				<div className="flex items-center justify-between">
+					<p className="text-sm text-muted-foreground">
+						Showing {offset + 1}-{Math.min(offset + pageSize, totalCount)} of{" "}
+						{totalCount}
+					</p>
+					<div className="flex gap-2">
+						<Button
+							type="button"
+							variant="outline"
+							disabled={page === 1}
+							onClick={() => setPage((current) => current - 1)}
+						>
+							Previous
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							disabled={!incidentsQuery.data?.next}
+							onClick={() => setPage((current) => current + 1)}
+						>
+							Next
+						</Button>
+					</div>
 				</div>
 			)}
 		</div>
