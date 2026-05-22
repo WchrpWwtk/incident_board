@@ -36,5 +36,5 @@ export function AuthBootstrap({ children }: PropsWithChildren) {
 		);
 	}
 
-	return children
+	return children;
 }

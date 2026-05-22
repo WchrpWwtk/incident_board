@@ -28,6 +28,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select.tsx";
+import { toast } from "sonner";
 
 export function EditIncidentPage() {
 	const { id } = useParams<{ id: string }>();
@@ -65,6 +66,8 @@ export function EditIncidentPage() {
 		mutationFn: (values: UpdateIncidentFormValues) =>
 			updateIncident(incidentId, values),
 		onSuccess: async (incident) => {
+			toast.success("Incident updated successfully");
+
 			await queryClient.invalidateQueries({
 				queryKey: ["incidents"],
 			});
@@ -74,6 +77,9 @@ export function EditIncidentPage() {
 			});
 
 			navigate(`/incidents/${incident.id}`);
+		},
+		onError: () => {
+			toast.error("Failed to update incident");
 		},
 	});
 

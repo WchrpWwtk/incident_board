@@ -24,6 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select.tsx";
+import { toast } from "sonner";
 
 export function CreateIncidentPage() {
 	const navigate = useNavigate();
@@ -41,11 +42,16 @@ export function CreateIncidentPage() {
 	const createMutation = useMutation({
 		mutationFn: createIncident,
 		onSuccess: async (incident) => {
+			toast.success("Incident created successfully");
+
 			await queryClient.invalidateQueries({
 				queryKey: ["incidents"],
 			});
 
 			navigate(`/incidents/${incident.id}`);
+		},
+		onError: () => {
+			toast.error("Failed to create incident");
 		},
 	});
 
