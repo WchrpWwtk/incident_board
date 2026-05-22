@@ -7,6 +7,17 @@ import {
 } from "@/features/incidents/incident.api.ts";
 import * as React from "react";
 import { Button } from "@/components/ui/button.tsx";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog.tsx";
 
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
 
@@ -136,14 +147,34 @@ export function IncidentAttachments({ incidentId }: Props) {
 										{new Date(attachment.uploaded_at).toLocaleString()}
 									</p>
 								</div>
-								<Button
-									size="sm"
-									variant="destructive"
-									disabled={deleteMutation.isPending}
-									onClick={() => deleteMutation.mutate(attachment.id)}
-								>
-									Delete
-								</Button>
+								<AlertDialog>
+									<AlertDialogTrigger asChild>
+										<Button
+											size="sm"
+											variant="destructive"
+											disabled={deleteMutation.isPending}
+										>
+											Delete
+										</Button>
+									</AlertDialogTrigger>
+									<AlertDialogContent>
+										<AlertDialogHeader>
+											<AlertDialogTitle>Delete attachment?</AlertDialogTitle>
+											<AlertDialogDescription>
+												This file will be permanently deleted from storage. This
+												action cannot be undone.
+											</AlertDialogDescription>
+										</AlertDialogHeader>
+										<AlertDialogFooter>
+											<AlertDialogCancel>Cancel</AlertDialogCancel>
+											<AlertDialogAction
+												onClick={() => deleteMutation.mutate(attachment.id)}
+											>
+												Delete
+											</AlertDialogAction>
+										</AlertDialogFooter>
+									</AlertDialogContent>
+								</AlertDialog>
 							</div>
 						))
 					)}
