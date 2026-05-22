@@ -7,6 +7,17 @@ import {
 } from "@/features/incidents/incident.api.ts";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog.tsx";
 
 type Props = {
 	incidentId: number;
@@ -77,14 +88,34 @@ export function IncidentComments({ incidentId }: Props) {
 											{new Date(comment.created_at).toLocaleString()}
 										</p>
 									</div>
-									<Button
-										size="sm"
-										variant="destructive"
-										disabled={deleteMutation.isPending}
-										onClick={() => deleteMutation.mutate(comment.id)}
-									>
-										Delete
-									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<Button
+												size="sm"
+												variant="destructive"
+												disabled={deleteMutation.isPending}
+											>
+												Delete
+											</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>Delete comment?</AlertDialogTitle>
+												<AlertDialogDescription>
+													This comment will be permanently deleted. This action
+													cannot be undone.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Cancel</AlertDialogCancel>
+												<AlertDialogAction
+													onClick={() => deleteMutation.mutate(comment.id)}
+												>
+													Delete
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
 								</div>
 								<p className="mt-3 whitespace-pre-wrap text-sm">
 									{comment.body}
