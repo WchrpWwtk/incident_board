@@ -6,6 +6,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card.tsx";
+import { DashboardCharts } from "@/features/dashboard/DashboardCharts.tsx";
 
 export function DashboardPage() {
 	const dashboardQuery = useQuery({
@@ -107,6 +108,10 @@ export function DashboardPage() {
 					</CardContent>
 				</Card>
 			</div>
+			<DashboardCharts
+				statusData={data.incidents_by_status}
+				priorityData={data.incidents_by_priority}
+			/>
 		</div>
 	);
 }
