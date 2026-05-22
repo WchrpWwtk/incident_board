@@ -12,6 +12,8 @@ import type {
 import { Badge } from "@/components/ui/badge.tsx";
 import { useState } from "react";
 import { Input } from "@/components/ui/input.tsx";
+import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/error.ts";
 
 function formatStatus(status: IncidentStatus) {
 	return status.replaceAll("_", " ");
@@ -60,6 +62,9 @@ export function IncidentListPage() {
 			link.click();
 
 			window.URL.revokeObjectURL(url);
+		},
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
 		},
 	});
 

@@ -13,6 +13,7 @@ import { IncidentComments } from "@/features/incidents/IncidentComments.tsx";
 import { IncidentActivityTimeline } from "@/features/incidents/IncidentActivityTimeline.tsx";
 import { IncidentAttachments } from "@/features/incidents/IncidentAttachments.tsx";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/error.ts";
 
 export function IncidentDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -40,8 +41,8 @@ export function IncidentDetailPage() {
 				queryKey: ["incidents", id],
 			});
 		},
-		onError: () => {
-			toast.error("You do not have permission to perform this action");
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
 		},
 	});
 

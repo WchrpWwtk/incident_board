@@ -25,6 +25,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select.tsx";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/error.ts";
 
 export function CreateIncidentPage() {
 	const navigate = useNavigate();
@@ -50,8 +51,8 @@ export function CreateIncidentPage() {
 
 			navigate(`/incidents/${incident.id}`);
 		},
-		onError: () => {
-			toast.error("Failed to create incident");
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
 		},
 	});
 

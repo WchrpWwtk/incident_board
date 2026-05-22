@@ -18,6 +18,8 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog.tsx";
+import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/error.ts";
 
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
 
@@ -62,6 +64,9 @@ export function IncidentAttachments({ incidentId }: Props) {
 				inputRef.current.value = "";
 			}
 		},
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
+		},
 	});
 
 	const deleteMutation = useMutation({
@@ -74,6 +79,9 @@ export function IncidentAttachments({ incidentId }: Props) {
 			await queryClient.invalidateQueries({
 				queryKey: ["incidents", incidentId, "activity-logs"],
 			});
+		},
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
 		},
 	});
 

@@ -18,6 +18,8 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog.tsx";
+import { getApiErrorMessage } from "@/lib/error.ts";
+import { toast } from "sonner";
 
 type Props = {
 	incidentId: number;
@@ -42,6 +44,9 @@ export function IncidentComments({ incidentId }: Props) {
 				queryKey: ["incidents", incidentId, "comments"],
 			});
 		},
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
+		},
 	});
 
 	const deleteMutation = useMutation({
@@ -50,6 +55,9 @@ export function IncidentComments({ incidentId }: Props) {
 			await queryClient.invalidateQueries({
 				queryKey: ["incidents", incidentId, "comments"],
 			});
+		},
+		onError: (error) => {
+			toast.error(getApiErrorMessage(error));
 		},
 	});
 
