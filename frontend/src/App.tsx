@@ -2,12 +2,38 @@ import { LoginPage } from "@/features/auth/LoginPage.tsx";
 import * as React from "react";
 import { useAuth } from "@/features/auth/auth.store.tsx";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { DashboardPage } from "@/features/dashboard/DashboardPage.tsx";
 import { AppLayout } from "@/components/layout/AppLayout.tsx";
-import { IncidentListPage } from "@/features/incidents/IncidentListPage.tsx";
-import { IncidentDetailPage } from "@/features/incidents/IncidentDetailPage.tsx";
-import { CreateIncidentPage } from "@/features/incidents/CreateIncidentPage.tsx";
-import { EditIncidentPage } from "@/features/incidents/EditIncidentPage.tsx";
+import { lazy } from "react";
+
+const DashboardPage = lazy(() =>
+	import("@/features/dashboard/DashboardPage").then((module) => ({
+		default: module.DashboardPage,
+	})),
+);
+
+const IncidentListPage = lazy(() =>
+	import("@/features/incidents/IncidentListPage").then((module) => ({
+		default: module.IncidentListPage,
+	})),
+);
+
+const IncidentDetailPage = lazy(() =>
+	import("@/features/incidents/IncidentDetailPage").then((module) => ({
+		default: module.IncidentDetailPage,
+	})),
+);
+
+const CreateIncidentPage = lazy(() =>
+	import("@/features/incidents/CreateIncidentPage").then((module) => ({
+		default: module.CreateIncidentPage,
+	})),
+);
+
+const EditIncidentPage = lazy(() =>
+	import("@/features/incidents/EditIncidentPage").then((module) => ({
+		default: module.EditIncidentPage,
+	})),
+);
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	const { isAuthenticated } = useAuth();
