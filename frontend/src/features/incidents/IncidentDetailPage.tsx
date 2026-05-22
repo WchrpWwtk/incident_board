@@ -12,6 +12,7 @@ import { useAuth } from "@/features/auth/auth.store.tsx";
 import { IncidentComments } from "@/features/incidents/IncidentComments.tsx";
 import { IncidentActivityTimeline } from "@/features/incidents/IncidentActivityTimeline.tsx";
 import { IncidentAttachments } from "@/features/incidents/IncidentAttachments.tsx";
+import { toast } from "sonner";
 
 export function IncidentDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -29,6 +30,8 @@ export function IncidentDetailPage() {
 		mutationFn: (nextStatus: IncidentStatus) =>
 			updateIncidentStatus(incident.id, nextStatus),
 		onSuccess: async () => {
+			toast.success("Incident status updated");
+
 			await queryClient.invalidateQueries({
 				queryKey: ["incidents"],
 			});
@@ -36,6 +39,9 @@ export function IncidentDetailPage() {
 			await queryClient.invalidateQueries({
 				queryKey: ["incidents", id],
 			});
+		},
+		onError: () => {
+			toast.error("You do not have permission to perform this action");
 		},
 	});
 
