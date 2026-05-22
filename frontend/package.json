@@ -8,7 +8,9 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"format": "pnpx @biomejs/biome format --write"
+		"format": "pnpx @biomejs/biome format --write",
+		"test": "vitest",
+		"test:run": "vitest run --passWithNoTests"
 	},
 	"dependencies": {
 		"@fontsource-variable/jetbrains-mono": "^5.2.8",
@@ -53,6 +55,7 @@
 		"typescript": "~6.0.2",
 		"typescript-eslint": "^8.59.2",
 		"vite": "^8.0.12",
+		"vite-tsconfig-paths": "^6.1.1",
 		"vitest": "^4.1.6"
 	}
 }
