@@ -4,6 +4,7 @@ import {
 	CartesianGrid,
 	Pie,
 	PieChart,
+	Rectangle,
 	ResponsiveContainer,
 	Tooltip,
 	XAxis,
@@ -25,6 +26,13 @@ const STATUS_COLORS: Record<string, string> = {
 	cancelled: "#6b7280",
 };
 
+const PRIORITY_COLORS: Record<string, string> = {
+	low: "#22c55e",
+	medium: "#3b82f6",
+	high: "#f59e0b",
+	critical: "#ef4444",
+};
+
 export function DashboardCharts({ statusData, priorityData }: Props) {
 	const statusChartData = Object.entries(statusData).map(([name, value]) => ({
 		name: name.replaceAll("_", " "),
@@ -36,6 +44,7 @@ export function DashboardCharts({ statusData, priorityData }: Props) {
 		([name, value]) => ({
 			name,
 			value,
+			fill: PRIORITY_COLORS[name] ?? "#94a3b8",
 		}),
 	);
 
@@ -56,9 +65,14 @@ export function DashboardCharts({ statusData, priorityData }: Props) {
 					<BarChart data={priorityChartData}>
 						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis dataKey="name" />
-						<YAxis />
+						<YAxis allowDecimals={false} />
 						<Tooltip />
-						<Bar dataKey="name" />
+						<Bar
+							dataKey="value"
+							shape={(props) => (
+								<Rectangle {...props} fill={props.payload.fill} />
+							)}
+						/>
 					</BarChart>
 				</ResponsiveContainer>
 			</div>
