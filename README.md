@@ -190,11 +190,15 @@ Currently tested:
 - Workflow transitions
 - Incident CRUD
 
+## Run with Docker
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
 ## Future Improvements
 
-- Playwright E2E Tests
-- GitHub Actions CI/CD
-- Docker Compose
 - Email Notifications
 - WebSocket Notifications
 - S3 File Storage
