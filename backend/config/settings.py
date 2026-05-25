@@ -80,6 +80,9 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = "accounts.User"
 
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "False") == "True"
+COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "Lax")
+
 
 # Application definition
 

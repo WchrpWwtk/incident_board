@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -34,8 +35,8 @@ class LoginView(APIView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,  # True in production HTTPS
-            samesite="Lax",
+            secure=settings.COOKIE_SECURE,  # True in production HTTPS
+            samesite=settings.COOKIE_SAMESITE,
             max_age=60 * 15,
         )
 
@@ -43,8 +44,8 @@ class LoginView(APIView):
             key="refresh_token",
             value=refresh_token,
             httponly=True,
-            secure=False,  # True in production HTTPS
-            samesite="Lax",
+            secure=settings.COOKIE_SECURE,  # True in production HTTPS
+            samesite=settings.COOKIE_SAMESITE,
             max_age=60 * 60 * 24 * 7,
         )
 
@@ -70,9 +71,9 @@ class LogoutView(APIView):
             {"detail": "Logged out successfully"}, status=status.HTTP_200_OK
         )
 
-        response.delete_cookie("access_token", samesite="Lax")
+        response.delete_cookie("access_token", samesite=settings.COOKIE_SAMESITE)
 
-        response.delete_cookie("refresh_token", samesite="Lax")
+        response.delete_cookie("refresh_token", samesite=settings.COOKIE_SAMESITE)
 
         return response
 
@@ -109,8 +110,8 @@ class RefreshView(APIView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=settings.COOKIE_SECURE,
+            samesite=settings.COOKIE_SAMESITE,
             max_age=60 * 15,
         )
 
