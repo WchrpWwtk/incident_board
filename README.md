@@ -2,6 +2,11 @@
 
 A full-stack Incident Management System built with Django REST Framework and React.
 
+## Live Demo
+
+- Frontend: https://incident-board.onrender.com/
+- Backend API: https://incident-board-backend.onrender.com/
+
 ## Features
 
 ### Authentication
@@ -121,11 +126,15 @@ frontend/
 
 ### Dashboard
 
+![Dashboard](/docs/screenshots/dashboard.png)
+
 - KPI cards
 - Status chart
 - Priority chart
 
 ### Incident List
+
+![Incident List](/docs/screenshots/incident-list.png)
 
 - Search
 - Filters
@@ -133,6 +142,8 @@ frontend/
 - Export
 
 ### Incident Detail
+
+![Incident Detail](/docs/screenshots/incident-detail.png)
 
 - Workflow Actions
 - Attachments
