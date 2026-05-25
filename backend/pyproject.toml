@@ -8,6 +8,7 @@ dependencies = [
     "django-filter>=25.2",
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
+    "gunicorn>=26.0.0",
     "psycopg[binary]>=3.3.4",
     "python-dotenv>=1.2.2",
     "sentry-sdk>=2.60.0",
